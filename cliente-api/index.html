@@ -13,35 +13,78 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
         crossorigin="anonymous"></script>
     <script>
-    JSON.parse=JSON.parse || function(str){
-        if(str==="")
-            str='""';
-        eval("var p="+str+":");
-        return p;
-    };
+        JSON.parse = JSON.parse || function (str) {
+            if (str === "")
+                str = '""';
+            eval("var p=" + str + ":");
+            return p;
+        };
 
-    $(document).ready(function () {
-        function getProductos() {
-            $.ajax({
-                url:"http://localhost/API-SLIM2/public/api.php/productos",
-                type:"get",
-                success:function(response){
-                    $.each(JSON.parse(response),function (i,index) {
-                       if(index.id.length){
-                           $("table").append("<tr><td>"+index.id+"</td>"+
-                                        "<td>"+index.name+"</td>"+
-                                        "<td>"+index.description+"</td>"+
-                                        "<td>"+index.price+"</td>"+
-                                        "<td><span class='delete btn btn-danger' data-producto='"+index.id+"'>Borrar</span></td>"+
-                                        "<td><span class='update btn btn-warning' data-producto='"+index.id+"'>Editar</span></td>"+
-                                        "</tr>");
-                       } 
+        //visualizar datos
+        $(document).ready(function () {
+            function getProductos() {
+                $.ajax({
+                    url: "http://localhost/API-SLIM2/public/api.php/productos",
+                    type: "get",
+                    success: function (response) {
+                        $.each(JSON.parse(response), function (i, index) {
+                            if (index.id.length) {
+                                $("table").append("<tr><td>" + index.id + "</td>" +
+                                    "<td>" + index.name + "</td>" +
+                                    "<td>" + index.description + "</td>" +
+                                    "<td>" + index.price + "</td>" +
+                                    "<td><span class='delete btn btn-danger' data-producto='" +
+                                    index.id + "'>Borrar</span></td>" +
+                                    "<td><span class='update btn btn-warning' data-producto='" +
+                                    index.id + "'>Editar</span></td>" +
+                                    "</tr>");
+                            }
+                        });
+                        // BORRAR
+                        $(".delete").unbind("click").click(function () {
+                            $.ajax({
+                                url: "http://localhost/API-SLIM2/public/api.php/productos/"+$(this).data("producto"),
+                                type: "delete",
+                                success: function (response) {
+                                    $(".table").html(
+                                        "<tr><td>ID</td><td>Nombre</td><td>Descripcion</td><td>Precio</td><td>Editar</td></tr>");
+                                    getProductos();
+                                    $("#form").attr("data-producto","0");
+                                    $("$form")[0].reset();
+                                }
+                            });
+                        });
+
+                    }
+                });
+            }
+            getProductos();
+
+            // GUARDAR PRODUCTO
+            if ($("#form").data("producto") === 0) {
+                $("#form").submit(function (e) {
+                    e.preventDefault();
+
+                    $.ajax({
+                        url: "http://localhost/API-SLIM2/public/api.php/productos",
+                        type: "post",
+                        data: {
+                            name: $("#name_form").val(),
+                            description: $("#description_form").val(),
+                            price: $("#price_form").val()
+                        },
+                        success: function (response) {
+                            $(".table").html(
+                                "<tr><td>ID</td><td>Nombre</td><td>Descripcion</td><td>Precio</td><td>Editar</td></tr>"
+                            );
+                            getProductos();
+                            $("$form")[0].reset();
+                        }
                     });
-                }
-            });
-        }
-        getProductos();
-    });
+                    return false;
+                });
+            }
+        });
     </script>
 </head>
 
@@ -58,14 +101,12 @@
             </tr>
     </div>
     <div class="col-lg-8">
-        <form action="http://localhost/API-SLIM2/public/api.php/productos" method="post" data-producto=0>
+        <form id="form" action="http://localhost/API-SLIM2/public/api.php/productos" method="post" data-producto=0>
             Nombre
-            <input type="text" name="name" id="name_form" class="form-control"> 
-            <br>
-            Descripción
+            <input type="text" name="name" id="name_form" class="form-control">
+            <br> Descripción
             <textarea name="description" id="description_form" class="form-control" cols="30" rows="10"></textarea>
-            <br>
-            Precio
+            <br> Precio
             <input type="text" name="price" id="price_form" class="form-control">
             <br>
             <input type="submit" value="Enviar">
