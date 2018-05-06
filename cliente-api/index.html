@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cliente API Rest</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+        crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+    <script>
+    JSON.parse=JSON.parse || function(str){
+        if(str==="")
+            str='""';
+        eval("var p="+str+":");
+        return p;
+    };
+
+    $(document).ready(function () {
+        function getProductos() {
+            $.ajax({
+                url:"http://localhost/API-SLIM2/public/api.php/productos",
+                type:"get",
+                success:function(response){
+                    $.each(JSON.parse(response),function (i,index) {
+                       if(index.id.length){
+                           $("table").append("<tr><td>"+index.id+"</td>"+
+                                        "<td>"+index.name+"</td>"+
+                                        "<td>"+index.description+"</td>"+
+                                        "<td>"+index.price+"</td>"+
+                                        "<td><span class='delete btn btn-danger' data-producto='"+index.id+"'>Borrar</span></td>"+
+                                        "<td><span class='update btn btn-warning' data-producto='"+index.id+"'>Editar</span></td>"+
+                                        "</tr>");
+                       } 
+                    });
+                }
+            });
+        }
+        getProductos();
+    });
+    </script>
+</head>
+
+<body>
+    <h1>Cliente Web API REST Slim</h1>
+    <div class="col-lg-7">
+        <table class="table">
+            <tr>
+                <td>ID</td>
+                <td>Nombre</td>
+                <td>Descripcion</td>
+                <td>Precio</td>
+                <td>Editar</td>
+            </tr>
+    </div>
+    <div class="col-lg-8">
+        <form action="http://localhost/API-SLIM2/public/api.php/productos" method="post" data-producto=0>
+            Nombre
+            <input type="text" name="name" id="name_form" class="form-control"> 
+            <br>
+            Descripción
+            <textarea name="description" id="description_form" class="form-control" cols="30" rows="10"></textarea>
+            <br>
+            Precio
+            <input type="text" name="price" id="price_form" class="form-control">
+            <br>
+            <input type="submit" value="Enviar">
+        </form>
+    </div>
+    </table>
+</body>
+
+</html>
