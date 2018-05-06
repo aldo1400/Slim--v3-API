@@ -40,16 +40,49 @@
                                     "</tr>");
                             }
                         });
+                        // EDITAR
+
+                        $(".update").unbind("click").click(function () {
+                            //alert($(this).parents("tr").find("td")[1].innerHTML); OLEEEE yO !!!!!
+                            // Tomo los elementos de la fila y los pongo en el formulario
+                            $("#name_form").val($(this).parents("tr").find("td")[1].innerHTML);
+                            $("#description_form").val($(this).parents("tr").find("td")[2].innerHTML);
+                            $("#price_form").val($(this).parents("tr").find("td")[3].innerHTML);
+                            $("#form").submit(function (event) {
+                                event.preventDefault();
+                                $.ajax({
+                                    url: "http://localhost/API-SLIM2/public/api.php/productos/" +
+                                        $(this).data("producto"),
+                                    type: 'post',
+                                    data: {
+                                        nombre: $("#name_form").val(),
+                                        descripcion: $("#description_form").val(),
+                                        precio: $("#price_form").val()
+                                    },
+                                    success: function () {
+                                        $(".table").html(
+                                            `<tr><th>Id</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>ELIMINAR</th><th>EDITAR</th></tr>`
+                                        );
+                                        getProductos();
+                                        $("#form")[0].reset();
+                                    }
+                                });
+                                return false;
+                            });
+                        });
+
                         // BORRAR
                         $(".delete").unbind("click").click(function () {
                             $.ajax({
-                                url: "http://localhost/API-SLIM2/public/api.php/productos/"+$(this).data("producto"),
+                                url: "http://localhost/API-SLIM2/public/api.php/productos/" +
+                                    $(this).data("producto"),
                                 type: "delete",
                                 success: function (response) {
                                     $(".table").html(
-                                        "<tr><td>ID</td><td>Nombre</td><td>Descripcion</td><td>Precio</td><td>Editar</td></tr>");
+                                        "<tr><td>ID</td><td>Nombre</td><td>Descripcion</td><td>Precio</td><td>Editar</td></tr>"
+                                    );
                                     getProductos();
-                                    $("#form").attr("data-producto","0");
+                                    $("#form").attr("data-producto", "0");
                                     $("$form")[0].reset();
                                 }
                             });
