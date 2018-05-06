@@ -62,17 +62,29 @@ $app->group('/api',function() use ($app,$url){
     $app->group('/ejemplo',function() use ($app,$url){
         $app->get('/hola/{nombre}',function(Request $request,Response $response){
             echo "Hola ".$request->getAttribute('nombre');
-        });
+        })->setName("hola");
+
         $app->get('/dime-tu-apellido/{apellido}',function(Request $request , Response $response){
             echo "Tu apellido es:".$request->getAttribute('apellido');
         });
+
         $app->get('/mandame-a-hola',function(Request $request,Response $response) use ($app,$url) {
-            return $response->withRedirect($url."hola/Victor");
+            $nuevaruta=$app->getContainer()->get('router')->pathFor("hola",[
+                'nombre'=>'Victor RObles'
+            ]);//Obtner la direccion de la ruta hola, se usa pathFor en slim v3
+            return $response->withRedirect($nuevaruta);
         });
     });
 });
 
+// OBETNER todos los parametros usando getParams (metodo del objeto $request)
 
-
+$app->get('/test/{nombre}' ,function (Request $request, Response $response) {
+    var_dump($request->getParams());
+    
+});
 
 $app->run();
+
+
+
